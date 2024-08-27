@@ -1,5 +1,5 @@
-import { Connection, clusterApiUrl } from '@solana/web3.js'
+import { Cluster, Connection, clusterApiUrl } from '@solana/web3.js'
 
-export const BASE_URL = process.env.NODE_ENV === 'production' ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000'
-export const connection = new Connection(clusterApiUrl('devnet'), 'confirmed')
+export const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL as string
+export const connection = new Connection(clusterApiUrl(process.env.SOLANA_NETWORK as Cluster), 'processed')
 export const TILE_SIZE = 64
