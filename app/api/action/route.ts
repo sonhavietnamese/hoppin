@@ -57,36 +57,36 @@ export async function POST(req: Request) {
   const transaction = await createBlankTransaction(sender)
 
   if (stage === 'start') {
-    let params
+    // let params
 
-    if (step === 0) {
-      params = {
-        holes: [],
-        character: [0, 0],
-        padding: [0, 0, 0, 0],
-        offset: 0,
-        state: undefined,
-      }
-    } else {
-      let character = [0, 0]
-      if (direction === 'left') {
-        hole[5 - step] = [0, 1]
-        character = [0, 5 - step]
-      } else {
-        hole[5 - step] = [1, 0]
-        character = [1, 5 - step]
-      }
+    // if (step === 0) {
+    //   params = {
+    //     holes: [],
+    //     character: [0, 0],
+    //     padding: [0, 0, 0, 0],
+    //     offset: 0,
+    //     state: undefined,
+    //   }
+    // } else {
+    //   let character = [0, 0]
+    //   if (direction === 'left') {
+    //     hole[5 - step] = [0, 1]
+    //     character = [0, 5 - step]
+    //   } else {
+    //     hole[5 - step] = [1, 0]
+    //     character = [1, 5 - step]
+    //   }
 
-      params = {
-        holes: hole,
-        character: character,
-        padding: [0, 0, 0, 0],
-        offset: 0,
-        state: undefined,
-      }
-    }
+    //   params = {
+    //     holes: hole,
+    //     character: character,
+    //     padding: [0, 0, 0, 0],
+    //     offset: 0,
+    //     state: undefined,
+    //   }
+    // }
 
-    const image = await generateImage(params)
+    // const image = await generateImage(params)
 
     const transaction = await createBlankTransaction(sender)
 
@@ -97,7 +97,7 @@ export async function POST(req: Request) {
             type: 'inline',
             action: {
               description: ``,
-              icon: image,
+              icon: `https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR2UOW09a8y-Ue_FtTFn01C4U4-dZmIax-P_g&s`,
               label: ``,
               title: `Hoppin | Ready`,
               type: 'action',
