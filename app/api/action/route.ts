@@ -158,6 +158,9 @@ export async function POST(req: Request) {
           })
         }
 
+        console.log('payload', payload)
+        console.log('tx', transaction.serialize().toString('base64'))
+
         return Response.json(payload, {
           headers: ACTIONS_CORS_HEADERS,
         })
