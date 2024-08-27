@@ -44,172 +44,127 @@ let hole = [
 export const OPTIONS = GET
 
 export async function POST(req: Request) {
-  try {
-    const body = (await req.json()) as { account: string; signature: string }
-    const { searchParams } = new URL(req.url)
+  const body = (await req.json()) as { account: string; signature: string }
+  const { searchParams } = new URL(req.url)
 
-    const sender = new PublicKey(body.account)
-    // blinksights.trackActionV2(body.account, req.url) // TODO: 400 error
-    const stage = searchParams.get('stage') as string
-    const step = parseInt(searchParams.get('step') as string)
-    const direction = searchParams.get('direction') as string
-    const claim = Boolean(searchParams.get('claim'))
+  const sender = new PublicKey(body.account)
+  // blinksights.trackActionV2(body.account, req.url) // TODO: 400 error
+  const stage = searchParams.get('stage') as string
+  const step = parseInt(searchParams.get('step') as string)
+  const direction = searchParams.get('direction') as string
+  const claim = Boolean(searchParams.get('claim'))
 
-    const transaction = await createBlankTransaction(sender)
+  const transaction = await createBlankTransaction(sender)
 
-    if (stage === 'start') {
-      try {
-        let params
+  if (stage === 'start') {
+    console.log('start')
 
-        if (step === 0) {
-          params = {
-            holes: [],
-            character: [0, 0],
-            padding: [0, 0, 0, 0],
-            offset: 0,
-            state: undefined,
-          }
-        } else {
-          let character = [0, 0]
-          if (direction === 'left') {
-            hole[5 - step] = [0, 1]
-            character = [0, 5 - step]
-          } else {
-            hole[5 - step] = [1, 0]
-            character = [1, 5 - step]
-          }
+    let params
 
-          params = {
-            holes: hole,
-            character: character,
-            padding: [0, 0, 0, 0],
-            offset: 0,
-            state: undefined,
-          }
-        }
+    if (step === 0) {
+      params = {
+        holes: [],
+        character: [0, 0],
+        padding: [0, 0, 0, 0],
+        offset: 0,
+        state: undefined,
+      }
+    } else {
+      let character = [0, 0]
+      if (direction === 'left') {
+        hole[5 - step] = [0, 1]
+        character = [0, 5 - step]
+      } else {
+        hole[5 - step] = [1, 0]
+        character = [1, 5 - step]
+      }
 
-        const image = await generateImage(params)
-
-        let payload: ActionPostResponse
-
-        if (step === 5) {
-          payload = await createPostResponse({
-            fields: {
-              links: {
-                next: {
-                  type: 'inline',
-                  action: {
-                    description: ``,
-                    icon: image,
-                    label: ``,
-                    title: `Hoppin | Congratulation 🎉`,
-                    type: 'action',
-                    links: {
-                      actions: [
-                        {
-                          label: `Claim`,
-                          href: `/api/action?stage=finish&claim=true`,
-                        },
-                      ],
-                    },
-                  },
-                },
-              },
-              transaction,
-            },
-          })
-        } else {
-          payload = await createPostResponse({
-            fields: {
-              links: {
-                next: {
-                  type: 'inline',
-                  action: {
-                    description: ``,
-                    icon: image,
-                    label: ``,
-                    title: `Hoppin | Ready`,
-                    type: 'action',
-                    links: {
-                      actions: [
-                        {
-                          label: `Left`,
-                          href: `/api/action?stage=start&direction=left&step=${step + 1}`,
-                        },
-                        {
-                          label: `Right`,
-                          href: `/api/action?stage=start&direction=right&step=${step + 1}`,
-                        },
-                      ],
-                    },
-                  },
-                },
-              },
-              transaction,
-            },
-          })
-        }
-
-        return NextResponse.json(payload, {
-          headers: ACTIONS_CORS_HEADERS,
-        })
-      } catch (err) {
-        console.log('Error when start', err)
-        let message = 'An unknown error occurred'
-        if (typeof err == 'string') message = err
-        return NextResponse.json({
-          status: 400,
-          headers: ACTIONS_CORS_HEADERS,
-        })
+      params = {
+        holes: hole,
+        character: character,
+        padding: [0, 0, 0, 0],
+        offset: 0,
+        state: undefined,
       }
     }
 
-    if (stage === 'finish') {
-      if (claim) {
-        // Memo transaction
+    const image = await generateImage(params)
 
-        const image = await generateImage({
-          holes: hole,
-          character: [0, 0],
-          padding: [0, 0, 0, 0],
-          offset: 0,
-          state: 'claimed',
-        })
+    let payload: ActionPostResponse
 
-        const payload = await createPostResponse({
-          fields: {
-            links: {
-              next: {
-                type: 'inline',
-                action: {
-                  description: ``,
-                  icon: image,
-                  label: ``,
-                  title: `Hoppin 🎉`,
-                  type: 'action',
-                  links: {
-                    actions: [
-                      {
-                        label: `Hop Again`,
-                        href: `/api/action?stage=start&step=0`,
-                      },
-                    ],
-                  },
+    if (step === 5) {
+      payload = await createPostResponse({
+        fields: {
+          links: {
+            next: {
+              type: 'inline',
+              action: {
+                description: ``,
+                icon: image,
+                label: ``,
+                title: `Hoppin | Congratulation 🎉`,
+                type: 'action',
+                links: {
+                  actions: [
+                    {
+                      label: `Claim`,
+                      href: `/api/action?stage=finish&claim=true`,
+                    },
+                  ],
                 },
               },
             },
-            transaction,
           },
-        })
-
-        return NextResponse.json(payload, {
-          headers: ACTIONS_CORS_HEADERS,
-        })
-      }
+          transaction,
+        },
+      })
+    } else {
+      payload = await createPostResponse({
+        fields: {
+          links: {
+            next: {
+              type: 'inline',
+              action: {
+                description: ``,
+                icon: image,
+                label: ``,
+                title: `Hoppin | Ready`,
+                type: 'action',
+                links: {
+                  actions: [
+                    {
+                      label: `Left`,
+                      href: `/api/action?stage=start&direction=left&step=${step + 1}`,
+                    },
+                    {
+                      label: `Right`,
+                      href: `/api/action?stage=start&direction=right&step=${step + 1}`,
+                    },
+                  ],
+                },
+              },
+            },
+          },
+          transaction,
+        },
+      })
     }
 
-    if (stage === 'tutorial') {
-      console.log('tutorial')
+    return NextResponse.json(payload, {
+      headers: ACTIONS_CORS_HEADERS,
+    })
+  }
+
+  if (stage === 'finish') {
+    if (claim) {
+      const image = await generateImage({
+        holes: hole,
+        character: [0, 0],
+        padding: [0, 0, 0, 0],
+        offset: 0,
+        state: 'claimed',
+      })
+
       const payload = await createPostResponse({
         fields: {
           links: {
@@ -217,14 +172,14 @@ export async function POST(req: Request) {
               type: 'inline',
               action: {
                 description: ``,
-                icon: `${BASE_URL}/tutorial.png`,
+                icon: image,
                 label: ``,
-                title: `Hoppin | Tutorial`,
+                title: `Hoppin 🎉`,
                 type: 'action',
                 links: {
                   actions: [
                     {
-                      label: `Hop in`,
+                      label: `Hop Again`,
                       href: `/api/action?stage=start&step=0`,
                     },
                   ],
@@ -240,13 +195,45 @@ export async function POST(req: Request) {
         headers: ACTIONS_CORS_HEADERS,
       })
     }
-  } catch (error) {
-    console.log('Error in POST /api/action', error)
-    return NextResponse.json({
-      status: 400,
+  }
+
+  if (stage === 'tutorial') {
+    console.log('tutorial')
+    const payload = await createPostResponse({
+      fields: {
+        links: {
+          next: {
+            type: 'inline',
+            action: {
+              description: ``,
+              icon: `${BASE_URL}/tutorial.png`,
+              label: ``,
+              title: `Hoppin | Tutorial`,
+              type: 'action',
+              links: {
+                actions: [
+                  {
+                    label: `Hop in`,
+                    href: `/api/action?stage=start&step=0`,
+                  },
+                ],
+              },
+            },
+          },
+        },
+        transaction,
+      },
+    })
+
+    return NextResponse.json(payload, {
       headers: ACTIONS_CORS_HEADERS,
     })
   }
+
+  return NextResponse.json({
+    status: 400,
+    headers: ACTIONS_CORS_HEADERS,
+  })
 }
 
 const createBlankTransaction = async (sender: PublicKey) => {
@@ -333,3 +320,31 @@ async function generateImage(config: {
     throw error
   }
 }
+
+// const example = {
+//   "links": {
+//       "next": {
+//           "type": "inline",
+//           "action": {
+//               "description": "",
+//               "icon": "",
+//               "label": "",
+//               "title": "Hoppin | Ready",
+//               "type": "action",
+//               "links": {
+//                   "actions": [
+//                       {
+//                           "label": "Left",
+//                           "href": "/api/action?stage=start&direction=left&step=1"
+//                       },
+//                       {
+//                           "label": "Right",
+//                           "href": "/api/action?stage=start&direction=right&step=1"
+//                       }
+//                   ]
+//               }
+//           }
+//       }
+//   },
+//   "transaction": "AQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAID3ZpRq3edJK7R5sTixnD629ys6NF4K4WL2uuvm+CzFTQDBkZv5SEXMv/srbpyw5vnvIzlu8X3EmssQ5s6QAAAAAVKU1qZKSEGTSTocWDaOHx8NbXdvJK7geQfqEBBBUSNEJERiXyA6/bQn3nK0yGXyGuPp1d4m+5+kjfAeH3gLBQCAQAJA+gDAAAAAAAAAgAgVGhpcyBpcyBhIGJsYW5rIG1lbW8gdHJhbnNhY3Rpb24="
+// }
