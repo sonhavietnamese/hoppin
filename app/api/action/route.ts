@@ -1,11 +1,12 @@
 import { BASE_URL, connection, TILE_SIZE } from '@/app/constants'
+import { blinksights } from '@/services/blinksight'
 import { ActionGetResponse, ACTIONS_CORS_HEADERS, createPostResponse, MEMO_PROGRAM_ID } from '@solana/actions'
 import { ActionPostResponse, NextActionLink } from '@solana/actions-spec'
 import { ComputeBudgetProgram, PublicKey, Transaction, TransactionInstruction } from '@solana/web3.js'
 import Jimp from 'jimp'
 
 export async function GET(req: Request) {
-  let response: ActionGetResponse = {
+  let response: ActionGetResponse = blinksights.createActionGetResponseV1(req.url, {
     type: 'action',
     icon: `${BASE_URL}/thumbnail.png`,
     title: 'Hoppin',
@@ -23,7 +24,7 @@ export async function GET(req: Request) {
         },
       ],
     },
-  }
+  })
 
   return Response.json(response, {
     headers: ACTIONS_CORS_HEADERS,
@@ -45,6 +46,8 @@ export async function POST(req: Request) {
   try {
     const body = (await req.json()) as { account: string; signature: string }
     const sender = new PublicKey(body.account)
+
+    // blinksights.trackActionV2(body.account, req.url) // TODO: 400 error
 
     const { searchParams } = new URL(req.url)
 
