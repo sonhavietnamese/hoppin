@@ -86,7 +86,13 @@ export async function POST(req: Request) {
     //   }
     // }
 
-    // const image = await generateImage(params)
+    const image = await generateImage({
+      holes: [],
+      character: [0, 0],
+      padding: [0, 0, 0, 0],
+      offset: 0,
+      state: undefined,
+    })
 
     const transaction = await createBlankTransaction(sender)
 
@@ -97,7 +103,7 @@ export async function POST(req: Request) {
             type: 'inline',
             action: {
               description: ``,
-              icon: `https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR2UOW09a8y-Ue_FtTFn01C4U4-dZmIax-P_g&s`,
+              icon: image,
               label: ``,
               title: `Hoppin | Ready`,
               type: 'action',
