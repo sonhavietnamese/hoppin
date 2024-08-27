@@ -88,75 +88,109 @@ export async function POST(req: Request) {
 
     const image = await generateImage(params)
 
-    if (step === 5) {
-      const transaction = await createBlankTransaction(sender)
-
-      const payload = await createPostResponse({
-        fields: {
-          links: {
-            next: {
-              type: 'inline',
-              action: {
-                description: ``,
-                icon: image,
-                label: ``,
-                title: `Hoppin | Congratulation 🎉`,
-                type: 'action',
-                links: {
-                  actions: [
-                    {
-                      label: `Claim`,
-                      href: `/api/action?stage=finish&claim=true`,
-                    },
-                  ],
-                },
+    const payload = await createPostResponse({
+      fields: {
+        links: {
+          next: {
+            type: 'inline',
+            action: {
+              description: ``,
+              icon: image,
+              label: ``,
+              title: `Hoppin | Ready`,
+              type: 'action',
+              links: {
+                actions: [
+                  {
+                    label: `Left`,
+                    href: `/api/action?stage=start&direction=left&step=${step + 1}`,
+                  },
+                  {
+                    label: `Right`,
+                    href: `/api/action?stage=start&direction=right&step=${step + 1}`,
+                  },
+                ],
               },
             },
           },
-          transaction,
         },
-      })
+        transaction,
+      },
+    })
 
-      return NextResponse.json(payload, {
-        headers: ACTIONS_CORS_HEADERS,
-      })
-    } else {
-      const transaction = await createBlankTransaction(sender)
+    return NextResponse.json(payload, {
+      headers: ACTIONS_CORS_HEADERS,
+    })
 
-      const payload = await createPostResponse({
-        fields: {
-          links: {
-            next: {
-              type: 'inline',
-              action: {
-                description: ``,
-                icon: image,
-                label: ``,
-                title: `Hoppin | Ready`,
-                type: 'action',
-                links: {
-                  actions: [
-                    {
-                      label: `Left`,
-                      href: `/api/action?stage=start&direction=left&step=${step + 1}`,
-                    },
-                    {
-                      label: `Right`,
-                      href: `/api/action?stage=start&direction=right&step=${step + 1}`,
-                    },
-                  ],
-                },
-              },
-            },
-          },
-          transaction,
-        },
-      })
+    // if (step === 5) {
+    //   const transaction = await createBlankTransaction(sender)
 
-      return NextResponse.json(payload, {
-        headers: ACTIONS_CORS_HEADERS,
-      })
-    }
+    //   const payload = await createPostResponse({
+    //     fields: {
+    //       links: {
+    //         next: {
+    //           type: 'inline',
+    //           action: {
+    //             description: ``,
+    //             icon: image,
+    //             label: ``,
+    //             title: `Hoppin | Congratulation 🎉`,
+    //             type: 'action',
+    //             links: {
+    //               actions: [
+    //                 {
+    //                   label: `Claim`,
+    //                   href: `/api/action?stage=finish&claim=true`,
+    //                 },
+    //               ],
+    //             },
+    //           },
+    //         },
+    //       },
+    //       transaction,
+    //     },
+    //   })
+
+    //   return NextResponse.json(payload, {
+    //     headers: ACTIONS_CORS_HEADERS,
+    //   })
+    // } else {
+    //   const transaction = await createBlankTransaction(sender)
+
+    //   const payload = await createPostResponse({
+    //     fields: {
+    //       links: {
+    //         next: {
+    //           type: 'inline',
+    //           action: {
+    //             description: ``,
+    //             icon: image,
+    //             label: ``,
+    //             title: `Hoppin | Ready`,
+    //             type: 'action',
+    //             links: {
+    //               actions: [
+    //                 {
+    //                   label: `Left`,
+    //                   href: `/api/action?stage=start&direction=left&step=${step + 1}`,
+    //                 },
+    //                 {
+    //                   label: `Right`,
+    //                   href: `/api/action?stage=start&direction=right&step=${step + 1}`,
+    //                 },
+    //               ],
+    //             },
+    //           },
+    //         },
+    //       },
+    //       transaction,
+    //     },
+    //   })
+
+    //   return NextResponse.json(payload, {
+    //     headers: ACTIONS_CORS_HEADERS,
+    //   })
+    // }
   }
 
   if (stage === 'finish') {
