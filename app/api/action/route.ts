@@ -253,46 +253,6 @@ export async function POST(req: Request) {
   }
 }
 
-export const getCompletedAction = (stage: string): NextActionLink => {
-  return {
-    type: 'inline',
-    action: {
-      description: `Action ${stage} completed`,
-      icon: `${BASE_URL}/${stage}.webp`,
-      label: `Action ${stage} Label`,
-      title: `Action ${stage} completed`,
-      type: 'completed',
-    },
-  }
-}
-
-export const getNextAction = (stage: string): NextActionLink => {
-  return {
-    type: 'inline',
-    action: {
-      description: `Action ${stage}`,
-      icon: `${BASE_URL}/${stage}.webp`,
-      label: `Action ${stage} Label`,
-      title: `Action ${stage}`,
-      type: 'action',
-      links: {
-        actions: [
-          {
-            label: `Submit ${stage}`, // button text
-            href: `/api/action?amount={amount}&stage=${stage}`, // api endpoint
-            parameters: [
-              {
-                name: 'amount', // field name
-                label: 'Enter a custom SOL amount', // text input placeholder
-              },
-            ],
-          },
-        ],
-      },
-    },
-  }
-}
-
 const createBlankTransaction = async (sender: PublicKey) => {
   const transaction = new Transaction()
   transaction.add(
