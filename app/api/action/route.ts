@@ -57,8 +57,6 @@ export async function POST(req: Request) {
   const transaction = await createBlankTransaction(sender)
 
   if (stage === 'start') {
-    console.log('start')
-
     let params
 
     if (step === 0) {
@@ -90,10 +88,10 @@ export async function POST(req: Request) {
 
     const image = await generateImage(params)
 
-    let payload: ActionPostResponse
-
     if (step === 5) {
-      payload = await createPostResponse({
+      const transaction = await createBlankTransaction(sender)
+
+      const payload = await createPostResponse({
         fields: {
           links: {
             next: {
@@ -118,8 +116,14 @@ export async function POST(req: Request) {
           transaction,
         },
       })
+
+      return NextResponse.json(payload, {
+        headers: ACTIONS_CORS_HEADERS,
+      })
     } else {
-      payload = await createPostResponse({
+      const transaction = await createBlankTransaction(sender)
+
+      const payload = await createPostResponse({
         fields: {
           links: {
             next: {
@@ -148,11 +152,11 @@ export async function POST(req: Request) {
           transaction,
         },
       })
-    }
 
-    return NextResponse.json(payload, {
-      headers: ACTIONS_CORS_HEADERS,
-    })
+      return NextResponse.json(payload, {
+        headers: ACTIONS_CORS_HEADERS,
+      })
+    }
   }
 
   if (stage === 'finish') {
@@ -198,7 +202,6 @@ export async function POST(req: Request) {
   }
 
   if (stage === 'tutorial') {
-    console.log('tutorial')
     const payload = await createPostResponse({
       fields: {
         links: {
