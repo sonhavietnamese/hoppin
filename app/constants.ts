@@ -1,5 +1,5 @@
-import { Cluster, Connection, clusterApiUrl } from '@solana/web3.js'
+import { Connection } from '@solana/web3.js'
 
 export const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL as string
-export const connection = new Connection(clusterApiUrl(process.env.SOLANA_NETWORK as Cluster), 'processed')
+export const connection = new Connection(process.env.HELIUS_RPC as string, 'confirmed')
 export const TILE_SIZE = 64
