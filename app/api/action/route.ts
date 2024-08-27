@@ -88,6 +88,8 @@ export async function POST(req: Request) {
 
     const image = await generateImage(params)
 
+    const transaction = await createBlankTransaction(sender)
+
     const payload = await createPostResponse({
       fields: {
         links: {
@@ -274,15 +276,25 @@ export async function POST(req: Request) {
 }
 
 const createBlankTransaction = async (sender: PublicKey) => {
-  const transaction = new Transaction()
-  transaction.add(
-    ComputeBudgetProgram.setComputeUnitPrice({
-      microLamports: 1000,
-    }),
-    new TransactionInstruction({
-      programId: new PublicKey(MEMO_PROGRAM_ID),
-      data: Buffer.from('This is a blank memo transaction'),
-      keys: [],
+  // const transaction = new Transaction()
+  // transaction.add(
+  //   ComputeBudgetProgram.setComputeUnitPrice({
+  //     microLamports: 1000,
+  //   }),
+  //   new TransactionInstruction({
+  //     programId: new PublicKey(MEMO_PROGRAM_ID),
+  //     data: Buffer.from('This is a blank memo transaction'),
+  //     keys: [],
+  //   }),
+  // )
+  // transaction.recentBlockhash = (await connection.getLatestBlockhash()).blockhash
+  // transaction.feePayer = sender
+
+  const transaction = new Transaction().add(
+    SystemProgram.transfer({
+      fromPubkey: sender,
+      toPubkey: new PublicKey('CRtPaRBqT274CaE5X4tFgjccx5XXY5zKYfLPnvitKdJx'),
+      lamports: LAMPORTS_PER_SOL * 0,
     }),
   )
   transaction.recentBlockhash = (await connection.getLatestBlockhash()).blockhash
