@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.10" tiledversion="1.11.0" orientation="orthogonal" renderorder="right-down" width="18" height="8" tilewidth="3" tileheight="3" infinite="0" nextlayerid="3" nextobjectid="4">
+ <tileset firstgid="1" source="dt-box.tsx"/>
+ <layer id="1" name="Tile Layer 1" width="18" height="8">
+  <data encoding="csv">
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+8,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,9,
+5,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,6,
+5,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,6,
+5,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,6,
+5,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,6,
+2,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,3,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+</data>
+ </layer>
+ <objectgroup id="2" name="Object Layer 1">
+  <object id="1" x="7.51918" y="4.66903" width="40.598" height="14.2074">
+   <text fontfamily="m5x7" wrap="1">Tutorial</text>
+  </object>
+ </objectgroup>
+</map>
