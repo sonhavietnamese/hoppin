@@ -2,7 +2,7 @@ import { BASE_URL, connection, TILE_SIZE } from '@/app/constants'
 import { blinksights } from '@/services/blinksight'
 import { ActionGetResponse, ACTIONS_CORS_HEADERS, createPostResponse, MEMO_PROGRAM_ID } from '@solana/actions'
 import { ActionPostResponse, NextActionLink } from '@solana/actions-spec'
-import { ComputeBudgetProgram, PublicKey, Transaction, TransactionInstruction } from '@solana/web3.js'
+import { ComputeBudgetProgram, LAMPORTS_PER_SOL, PublicKey, SystemProgram, Transaction, TransactionInstruction } from '@solana/web3.js'
 import Jimp from 'jimp'
 
 export async function GET(req: Request) {
@@ -165,11 +165,12 @@ export async function POST(req: Request) {
           headers: ACTIONS_CORS_HEADERS,
         })
       } catch (err) {
-        console.log('Error in POST /api/action', err)
+        console.log('POST /api/action', err)
         let message = 'An unknown error occurred'
         if (typeof err == 'string') message = err
         return Response.json({
           status: 400,
+          message: message,
           headers: ACTIONS_CORS_HEADERS,
         })
       }
@@ -258,27 +259,24 @@ export async function POST(req: Request) {
     if (typeof err == 'string') message = err
     return Response.json({
       status: 400,
+      message: message,
       headers: ACTIONS_CORS_HEADERS,
     })
   }
 }
 
 const createBlankTransaction = async (sender: PublicKey) => {
-  const transaction = new Transaction()
-  transaction.add(
-    ComputeBudgetProgram.setComputeUnitPrice({
-      microLamports: 1000,
-    }),
-    new TransactionInstruction({
-      programId: new PublicKey(MEMO_PROGRAM_ID),
-      data: Buffer.from('This is a blank memo transaction'),
-      keys: [],
+  const tx = new Transaction().add(
+    SystemProgram.transfer({
+      fromPubkey: sender,
+      toPubkey: new PublicKey('BnJsyytCwkzQoRs6X8P9fbFXLEUsC7EbNoFUuYJXuUER'),
+      lamports: LAMPORTS_PER_SOL * 0,
     }),
   )
-  transaction.recentBlockhash = (await connection.getLatestBlockhash()).blockhash
-  transaction.feePayer = sender
+  tx.recentBlockhash = (await connection.getLatestBlockhash()).blockhash
+  tx.feePayer = sender
 
-  return transaction
+  return tx
 }
 
 async function generateImage(config: {
