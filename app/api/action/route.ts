@@ -86,13 +86,25 @@ export async function POST(req: Request) {
     //   }
     // }
 
-    const image = await generateImage({
-      holes: [],
-      character: [0, 0],
-      padding: [0, 0, 0, 0],
-      offset: 0,
-      state: undefined,
-    })
+    let image = 'https://i.natgeofe.com/n/548467d8-c5f1-4551-9f58-6817a8d2c45e/NationalGeographic_2572187_square.jpg'
+
+    try {
+      image = await generateImage({
+        holes: [
+          [0, 0],
+          [0, 0],
+          [0, 0],
+          [0, 0],
+          [0, 0],
+        ],
+        character: [0, 0],
+        padding: [0, 0, 0, 0],
+        offset: 0,
+        state: undefined,
+      })
+    } catch (error) {
+      console.error('Error generating image:', error)
+    }
 
     const transaction = await createBlankTransaction(sender)
 
