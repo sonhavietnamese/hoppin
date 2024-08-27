@@ -56,6 +56,11 @@ export async function POST(req: Request) {
     const direction = searchParams.get('direction') as string
     const claim = Boolean(searchParams.get('claim'))
 
+    console.log('stage', stage)
+    console.log('step', step)
+    console.log('direction', direction)
+    console.log('claim', claim)
+
     if (stage === 'start') {
       try {
         const transaction = await createBlankTransaction(sender)
@@ -90,6 +95,8 @@ export async function POST(req: Request) {
         }
 
         const image = await generateImage(params)
+
+        console.log('image', image)
 
         let payload: ActionPostResponse
 
@@ -158,7 +165,7 @@ export async function POST(req: Request) {
         console.log('Error in POST /api/action', err)
         let message = 'An unknown error occurred'
         if (typeof err == 'string') message = err
-        return new Response(message, {
+        return Response.json({
           status: 400,
           headers: ACTIONS_CORS_HEADERS,
         })
@@ -246,7 +253,7 @@ export async function POST(req: Request) {
     console.log('Error in POST /api/action', err)
     let message = 'An unknown error occurred'
     if (typeof err == 'string') message = err
-    return new Response(message, {
+    return Response.json({
       status: 400,
       headers: ACTIONS_CORS_HEADERS,
     })
