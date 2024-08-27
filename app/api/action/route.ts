@@ -4,9 +4,10 @@ import { ActionGetResponse, ACTIONS_CORS_HEADERS, createPostResponse, MEMO_PROGR
 import { ActionPostResponse, NextActionLink } from '@solana/actions-spec'
 import { ComputeBudgetProgram, LAMPORTS_PER_SOL, PublicKey, SystemProgram, Transaction, TransactionInstruction } from '@solana/web3.js'
 import Jimp from 'jimp'
+import { NextResponse } from 'next/server'
 
 export async function GET(req: Request) {
-  let response: ActionGetResponse = blinksights.createActionGetResponseV1(req.url, {
+  let response: ActionGetResponse = {
     type: 'action',
     icon: `${BASE_URL}/thumbnail.png`,
     title: 'Hoppin',
@@ -20,13 +21,13 @@ export async function GET(req: Request) {
         },
         {
           label: 'Tutorial',
-          href: '/api/action?to=tutorial',
+          href: '/api/action?stage=tutorial',
         },
       ],
     },
-  })
+  }
 
-  return Response.json(response, {
+  return NextResponse.json(response, {
     headers: ACTIONS_CORS_HEADERS,
   })
 }
@@ -45,26 +46,19 @@ export const OPTIONS = GET
 export async function POST(req: Request) {
   try {
     const body = (await req.json()) as { account: string; signature: string }
-    const sender = new PublicKey(body.account)
-
-    // blinksights.trackActionV2(body.account, req.url) // TODO: 400 error
-
     const { searchParams } = new URL(req.url)
 
+    const sender = new PublicKey(body.account)
+    // blinksights.trackActionV2(body.account, req.url) // TODO: 400 error
     const stage = searchParams.get('stage') as string
     const step = parseInt(searchParams.get('step') as string)
     const direction = searchParams.get('direction') as string
     const claim = Boolean(searchParams.get('claim'))
 
-    console.log('stage', stage)
-    console.log('step', step)
-    console.log('direction', direction)
-    console.log('claim', claim)
+    const transaction = await createBlankTransaction(sender)
 
     if (stage === 'start') {
       try {
-        const transaction = await createBlankTransaction(sender)
-
         let params
 
         if (step === 0) {
@@ -95,8 +89,6 @@ export async function POST(req: Request) {
         }
 
         const image = await generateImage(params)
-
-        console.log('image', image)
 
         let payload: ActionPostResponse
 
@@ -158,19 +150,15 @@ export async function POST(req: Request) {
           })
         }
 
-        console.log('payload', payload)
-        console.log('tx', transaction.serialize().toString('base64'))
-
-        return Response.json(payload, {
+        return NextResponse.json(payload, {
           headers: ACTIONS_CORS_HEADERS,
         })
       } catch (err) {
-        console.log('POST /api/action', err)
+        console.log('Error when start', err)
         let message = 'An unknown error occurred'
         if (typeof err == 'string') message = err
-        return Response.json({
+        return NextResponse.json({
           status: 400,
-          message: message,
           headers: ACTIONS_CORS_HEADERS,
         })
       }
@@ -179,7 +167,6 @@ export async function POST(req: Request) {
     if (stage === 'finish') {
       if (claim) {
         // Memo transaction
-        const transaction = await createBlankTransaction(sender)
 
         const image = await generateImage({
           holes: hole,
@@ -215,68 +202,69 @@ export async function POST(req: Request) {
           },
         })
 
-        return Response.json(payload, {
+        return NextResponse.json(payload, {
           headers: ACTIONS_CORS_HEADERS,
         })
       }
     }
 
-    // Memo transaction
-    const transaction = await createBlankTransaction(sender)
-
-    const payload = await createPostResponse({
-      fields: {
-        links: {
-          next: {
-            type: 'inline',
-            action: {
-              description: ``,
-              icon: `${BASE_URL}/tutorial.png`,
-              label: ``,
-              title: `Hoppin | Tutorial`,
-              type: 'action',
-              links: {
-                actions: [
-                  {
-                    label: `Hop in`,
-                    href: `/api/action?stage=start&step=0`,
-                  },
-                ],
+    if (stage === 'tutorial') {
+      console.log('tutorial')
+      const payload = await createPostResponse({
+        fields: {
+          links: {
+            next: {
+              type: 'inline',
+              action: {
+                description: ``,
+                icon: `${BASE_URL}/tutorial.png`,
+                label: ``,
+                title: `Hoppin | Tutorial`,
+                type: 'action',
+                links: {
+                  actions: [
+                    {
+                      label: `Hop in`,
+                      href: `/api/action?stage=start&step=0`,
+                    },
+                  ],
+                },
               },
             },
           },
+          transaction,
         },
-        transaction,
-      },
-    })
+      })
 
-    return Response.json(payload, {
-      headers: ACTIONS_CORS_HEADERS,
-    })
-  } catch (err) {
-    console.log('Error in POST /api/action', err)
-    let message = 'An unknown error occurred'
-    if (typeof err == 'string') message = err
-    return Response.json({
+      return NextResponse.json(payload, {
+        headers: ACTIONS_CORS_HEADERS,
+      })
+    }
+  } catch (error) {
+    console.log('Error in POST /api/action', error)
+    return NextResponse.json({
       status: 400,
-      message: message,
       headers: ACTIONS_CORS_HEADERS,
     })
   }
 }
 
 const createBlankTransaction = async (sender: PublicKey) => {
-  const tx = new Transaction().add(
-    SystemProgram.transfer({
-      fromPubkey: sender,
-      toPubkey: new PublicKey('BnJsyytCwkzQoRs6X8P9fbFXLEUsC7EbNoFUuYJXuUER'),
-      lamports: LAMPORTS_PER_SOL * 0,
+  const transaction = new Transaction()
+  transaction.add(
+    ComputeBudgetProgram.setComputeUnitPrice({
+      microLamports: 1000,
+    }),
+    new TransactionInstruction({
+      programId: new PublicKey(MEMO_PROGRAM_ID),
+      data: Buffer.from('This is a blank memo transaction'),
+      keys: [],
     }),
   )
-  tx.recentBlockhash = (await connection.getLatestBlockhash()).blockhash
-  tx.feePayer = sender
+  transaction.recentBlockhash = (await connection.getLatestBlockhash()).blockhash
+  transaction.feePayer = sender
 
-  return tx
+  return transaction
 }
 
 async function generateImage(config: {
