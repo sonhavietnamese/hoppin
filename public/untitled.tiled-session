@@ -9,17 +9,19 @@
     ],
     "fileStates": {
         "dt-box.tsx": {
-            "dynamicWrapping": true
+            "dynamicWrapping": true,
+            "scaleInDock": 11,
+            "scaleInEditor": 1
         },
         "new-map.tsx": {
             "dynamicWrapping": false,
-            "scaleInDock": 2,
+            "scaleInDock": 1.5,
             "scaleInEditor": 1
         },
         "spr_tileset_sunnysideworld_forest_32px.tsx": {
             "dynamicWrapping": false,
             "scaleInDock": 1.5,
-            "scaleInEditor": 4
+            "scaleInEditor": 1
         },
         "tutorial-banner.tmx": {
             "expandedObjectLayers": [
@@ -37,7 +39,7 @@
                 13
             ],
             "scale": 4,
-            "selectedLayer": 11,
+            "selectedLayer": 10,
             "viewCenter": {
                 "x": 69.25,
                 "y": 65.875
@@ -53,11 +55,15 @@
     "openFiles": [
         "new-map.tsx",
         "untitled.tmx",
-        "spr_tileset_sunnysideworld_forest_32px.tsx"
+        "spr_tileset_sunnysideworld_forest_32px.tsx",
+        "tutorial-banner.tmx",
+        "dt-box.tsx"
     ],
     "project": "untitled.tiled-project",
     "recentFiles": [
         "new-map.tsx",
+        "dt-box.tsx",
+        "tutorial-banner.tmx",
         "spr_tileset_sunnysideworld_forest_32px.tsx",
         "untitled.tmx"
     ],
