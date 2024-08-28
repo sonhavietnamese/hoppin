@@ -1,10 +1,11 @@
 import { BASE_URL, connection } from '@/app/constants'
+import { blinksights } from '@/services/blinksight'
 import { ActionGetResponse, ACTIONS_CORS_HEADERS, createPostResponse, MEMO_PROGRAM_ID } from '@solana/actions'
 import { ComputeBudgetProgram, PublicKey, Transaction, TransactionInstruction } from '@solana/web3.js'
 import { NextResponse } from 'next/server'
 
 export async function GET(req: Request) {
-  let response: ActionGetResponse = {
+  let response: ActionGetResponse = blinksights.createActionGetResponseV1(req.url, {
     type: 'action',
     icon: `${BASE_URL}/thumbnail.png`,
     title: 'Hoppin',
@@ -22,7 +23,7 @@ export async function GET(req: Request) {
         },
       ],
     },
-  }
+  })
 
   return NextResponse.json(response, {
     headers: ACTIONS_CORS_HEADERS,
