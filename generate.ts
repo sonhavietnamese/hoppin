@@ -284,6 +284,16 @@ const MAP_CASES = [
   {
     holes: [
       [0, 0],
+      [0, 1],
+      [0, 1],
+      [0, 1],
+      [0, 1],
+    ],
+    character: [0, 2],
+  },
+  {
+    holes: [
+      [0, 0],
       [1, 0],
       [0, 1],
       [0, 1],
@@ -525,6 +535,16 @@ const MAP_CASES = [
     holes: [
       [0, 1],
       [1, 0],
+      [0, 1],
+      [0, 1],
+      [0, 1],
+    ],
+    character: [0, 1],
+  },
+  {
+    holes: [
+      [0, 1],
+      [0, 1],
       [0, 1],
       [0, 1],
       [0, 1],
@@ -728,11 +748,8 @@ async function generateImage(config: { holes: number[][]; character: number[] })
       })
     }
 
-    // const randomImageName = `combined_image_${Math.random().toString(36).substring(2, 15)}.png`
-    // const outputFilePath = `./public/output/${randomImageName}`
-    // const imageName = ""
     const imageName = config.holes.flat().join('') + '.png'
-    const outputFilePath = `./public/output/${imageName}`
+    const outputFilePath = `./public/maps/${imageName}`
 
     await EMPTY_MAP.writeAsync(outputFilePath)
     return imageName
@@ -753,5 +770,7 @@ const generate = async () => {
     console.log(`Generated image: ${imageName}`)
   }
 }
+
+console.log(MAP_CASES.length)
 
 generate()

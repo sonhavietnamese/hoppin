@@ -11,8 +11,10 @@
   "dependencies": {
     "@solana/actions": "^1.6.2",
     "@solana/actions-spec": "^2.2.1",
+    "@solana/spl-token": "^0.4.8",
     "axios": "^1.7.5",
     "blinksights-sdk": "^1.0.9",
+    "bs58": "^6.0.0",
     "jimp": "^0.22.12",
     "next": "14.2.6",
     "react": "^18",
