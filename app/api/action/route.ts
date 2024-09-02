@@ -12,44 +12,12 @@ import {
 } from '@/app/constants'
 import { blinksights } from '@/services/blinksight'
 import { ActionGetResponse, ACTIONS_CORS_HEADERS, createPostResponse, MEMO_PROGRAM_ID } from '@solana/actions'
-import {
-  ComputeBudgetProgram,
-  PublicKey,
-  Transaction,
-  TransactionInstruction,
-  Connection,
-  Keypair,
-  ParsedAccountData,
-  sendAndConfirmTransaction,
-} from '@solana/web3.js'
+import { createTransferInstruction, getOrCreateAssociatedTokenAccount } from '@solana/spl-token'
+import { ComputeBudgetProgram, PublicKey, Transaction, TransactionInstruction } from '@solana/web3.js'
 import { NextResponse } from 'next/server'
-import { getOrCreateAssociatedTokenAccount, createTransferInstruction } from '@solana/spl-token'
 
 export async function GET(req: Request) {
-  // let response: ActionGetResponse = blinksights.createActionGetResponseV1(req.url, {
-  //   type: 'action',
-  //   icon: `${BASE_URL}/thumbnail.png`,
-  //   title: 'Hoppin',
-  //   description: 'Hop through holes and collect $SEND',
-  //   label: '',
-  //   links: {
-  //     actions: [
-  //       {
-  //         label: 'Start',
-  //         href: '/api/action?stage=start&step=0',
-  //       },
-  //       {
-  //         label: 'Tutorial',
-  //         href: '/api/action?stage=tutorial',
-  //       },
-  //     ],
-  //   },
-  // })
-
-  // return NextResponse.json(response, {
-  //   headers: ACTIONS_CORS_HEADERS,
-  // })
-  let response: ActionGetResponse = {
+  let response: ActionGetResponse = await blinksights.createActionGetResponseV1(req.url, {
     type: 'action',
     icon: `${BASE_URL}/thumbnail.png`,
     title: 'Hoppin',
@@ -67,7 +35,7 @@ export async function GET(req: Request) {
         },
       ],
     },
-  }
+  })
 
   return NextResponse.json(response, {
     headers: ACTIONS_CORS_HEADERS,
@@ -75,7 +43,7 @@ export async function GET(req: Request) {
 }
 
 const DATA: Record<string, { currentHoles: number[][]; generatedHoles: number[][]; step: number; isWin: boolean }> = {
-  '0xasdasdas': {
+  dummy: {
     currentHoles: [],
     generatedHoles: [],
     step: 0,
@@ -91,13 +59,11 @@ export async function POST(req: Request) {
   const { searchParams } = new URL(req.url)
 
   const sender = new PublicKey(body.account)
-  // blinksights.trackActionV2(body.account, req.url) // TODO: 400 error
+  blinksights.trackActionV2(body.account, req.url)
   const stage = searchParams.get('stage') as string
   const step = parseInt(searchParams.get('step') as string)
   const direction = searchParams.get('direction') as string
   const claim = Boolean(searchParams.get('claim'))
-
-  // const transaction = await createBlankTransaction(sender)
 
   if (stage === 'start') {
     const transaction = await createBlankTransaction(sender)
