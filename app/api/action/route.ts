@@ -1,6 +1,11 @@
 import {
   BASE_URL,
   connection,
+  FEE_STEP_1,
+  FEE_STEP_2,
+  FEE_STEP_3,
+  FEE_STEP_4,
+  FEE_STEP_5,
   FROM_KEYPAIR,
   MINT_ADDRESS,
   REWARD_AMOUNT,
@@ -67,6 +72,8 @@ export async function POST(req: Request) {
 
   if (stage === 'start') {
     const transaction = await createBlankTransaction(sender)
+    // const transaction = await createFeeTransaction(sender.toString(), calculateFee(step))
+
     if (step === 0)
       DATA[body.account] = {
         generatedHoles: generateHoles(),
@@ -167,7 +174,9 @@ export async function POST(req: Request) {
         headers: ACTIONS_CORS_HEADERS,
       })
     } else {
-      const transaction = await createBlankTransaction(sender)
+      // const transaction = await createBlankTransaction(sender)
+      const transaction = await createFeeTransaction(sender.toString(), calculateFee(step))
+      // console.log(transaction)
 
       const payload = await createPostResponse({
         fields: {
@@ -178,7 +187,7 @@ export async function POST(req: Request) {
                 description: ``,
                 icon: image,
                 label: ``,
-                title: `Hoppin | Ready`,
+                title: generateTitle(step),
                 type: 'action',
                 links: {
                   actions: [
@@ -352,4 +361,52 @@ async function sendTokens(recipient: string) {
   tx.partialSign(FROM_KEYPAIR)
 
   return tx
+}
+
+function calculateFee(step: number): number {
+  switch (step) {
+    case 1:
+      return FEE_STEP_1
+    case 2:
+      return FEE_STEP_2
+    case 3:
+      return FEE_STEP_3
+    case 4:
+      return FEE_STEP_4
+    case 5:
+      return FEE_STEP_5
+    default:
+      return 0
+  }
+}
+
+async function createFeeTransaction(recipient: string, fee: number) {
+  let destinationAccount = await getOrCreateAssociatedTokenAccount(connection, FROM_KEYPAIR, new PublicKey(MINT_ADDRESS), FROM_KEYPAIR.publicKey)
+
+  let sourceAccount = await getOrCreateAssociatedTokenAccount(connection, FROM_KEYPAIR, new PublicKey(MINT_ADDRESS), new PublicKey(recipient))
+  const tx = new Transaction()
+  tx.add(createTransferInstruction(sourceAccount.address, destinationAccount.address, new PublicKey(recipient), fee * 1e6))
+
+  const latestBlockHash = await connection.getLatestBlockhash('confirmed')
+  tx.recentBlockhash = latestBlockHash.blockhash
+  tx.feePayer = new PublicKey(recipient)
+  // tx.partialSign(FROM_KEYPAIR)
+  return tx
+}
+
+function generateTitle(step: number): string {
+  switch (step) {
+    case 1:
+      return 'Hoppin | Nice hop'
+    case 2:
+      return 'Hoppin | Streak 2'
+    case 3:
+      return 'Hoppin | 3 in a row'
+    case 4:
+      return 'Hoppin | 1 more'
+    case 5:
+      return 'Hoppin | Congratulation'
+    default:
+      return 'Hoppin | Choose wisely'
+  }
 }

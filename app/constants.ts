@@ -10,6 +10,12 @@ export const WINRATE_STEP_3 = parseFloat(process.env.WINRATE_STEP_3 as string)
 export const WINRATE_STEP_4 = parseFloat(process.env.WINRATE_STEP_4 as string)
 export const WINRATE_STEP_5 = parseFloat(process.env.WINRATE_STEP_5 as string)
 
+export const FEE_STEP_1 = parseInt(process.env.FEE_STEP_1 as string)
+export const FEE_STEP_2 = parseInt(process.env.FEE_STEP_2 as string)
+export const FEE_STEP_3 = parseInt(process.env.FEE_STEP_3 as string)
+export const FEE_STEP_4 = parseInt(process.env.FEE_STEP_4 as string)
+export const FEE_STEP_5 = parseInt(process.env.FEE_STEP_5 as string)
+
 export const FROM_KEYPAIR = Keypair.fromSecretKey(new Uint8Array(bs58.decode(process.env.PRIVATE_KEY as string)))
 export const MINT_ADDRESS = process.env.MINT_ADDRESS as string
 export const REWARD_AMOUNT = parseInt(process.env.REWARD_AMOUNT as string)
