@@ -59,7 +59,7 @@ export async function POST(req: Request) {
   const { searchParams } = new URL(req.url)
 
   const sender = new PublicKey(body.account)
-  blinksights.trackActionV2(body.account, req.url)
+  // blinksights.trackActionV2(body.account, req.url)
   const stage = searchParams.get('stage') as string
   const step = parseInt(searchParams.get('step') as string)
   const direction = searchParams.get('direction') as string
@@ -341,9 +341,10 @@ function determineWin(step: number): boolean {
 
 async function sendTokens(recipient: string) {
   let sourceAccount = await getOrCreateAssociatedTokenAccount(connection, FROM_KEYPAIR, new PublicKey(MINT_ADDRESS), FROM_KEYPAIR.publicKey)
+
   let destinationAccount = await getOrCreateAssociatedTokenAccount(connection, FROM_KEYPAIR, new PublicKey(MINT_ADDRESS), new PublicKey(recipient))
   const tx = new Transaction()
-  tx.add(createTransferInstruction(sourceAccount.address, destinationAccount.address, FROM_KEYPAIR.publicKey, REWARD_AMOUNT * 1e9))
+  tx.add(createTransferInstruction(sourceAccount.address, destinationAccount.address, FROM_KEYPAIR.publicKey, REWARD_AMOUNT * 1e6))
 
   const latestBlockHash = await connection.getLatestBlockhash('confirmed')
   tx.recentBlockhash = latestBlockHash.blockhash

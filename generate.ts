@@ -711,6 +711,16 @@ const MAP_CASES = [
     ],
     character: [1, 1],
   },
+  {
+    holes: [
+      [1, 0],
+      [0, 1],
+      [0, 1],
+      [0, 1],
+      [0, 1],
+    ],
+    character: [1, 1],
+  },
 ]
 
 async function generateImage(config: { holes: number[][]; character: number[] }) {
