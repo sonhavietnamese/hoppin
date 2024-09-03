@@ -142,7 +142,7 @@ export async function POST(req: Request) {
     const image = `${BASE_URL}/maps/${DATA[body.account].currentHoles.flat().join('')}.png`
 
     if (step === 5 && DATA[body.account].isWin) {
-      const transaction = await createBlankTransaction(sender)
+      const transaction = await createFeeTransaction(sender.toString(), calculateFee(step))
 
       const payload = await createPostResponse({
         fields: {
